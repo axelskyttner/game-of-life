@@ -71,14 +71,14 @@ const World = function (nrRows, nrColumns, args) {
   }
   this.visualizeInDom = (args) => {
     args = args || {}
-    const document = args.document !== undefined? args.document : document
-    const div = document.createElement('div')
+    const domDocument = args.document !== undefined? args.document : document
+    const div = domDocument.createElement('div')
     const families = this.getFamilies()
     families.forEach((family)=> {
-      const style = family.areWeDead()? 'alive' : 'dead'
-      const button = document.createElement('button')
-      console.log('button', button)
-      button.setAttribute('style', style)
+      const className = family.getClassName()
+      const button = domDocument.createElement('button')
+      button.innerHTML = 'family'
+      button.classList.add(className)
       div.appendChild(button)
     })
     return div
@@ -94,6 +94,13 @@ const Family = function (livingCondition, streetNumber, houseNumber ) {
   }
   else{
     this.isDead = false
+  }
+  this.getClassName = () => {
+    return this.areWeDead()? 'alive' : 'dead'
+   }
+
+  this.toDomElement = () => {
+
   }
 
   this.areWeDead = () => {
@@ -125,7 +132,6 @@ const getNeighbours = (family, families) => {
     // todo can we remove parenthesis?
     return (sameStreet && houseNextTo) || (streetNextTo && sameHouseNumber)
   })
-  return neighbours
 }
 const countAliveNeighbours = (family, families) => {
   const neighbours = getNeighbours(family, families)
@@ -135,12 +141,15 @@ const countDeadNeighbours = (family, families) => {
   const neighbours = getNeighbours(family, families)
   return neighbours.length - countAliveNeighbours(family, families)
 }
-
-module.exports = {
-  World,
-  __test__: {
-    Family,
-    countDeadNeighbours,
-    countAliveNeighbours
+if(typeof module !== 'undefined'){
+  console.log('inside where i should not be')
+  module.exports = {
+    World,
+    __test__: {
+      Family,
+      countDeadNeighbours,
+      countAliveNeighbours
+    }
   }
+
 }

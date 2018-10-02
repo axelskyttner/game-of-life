@@ -1,13 +1,38 @@
 <html>
   <head>
-    <!-- <script src="/front-end.js"></script> -->
+    <script src="/front-end.js"></script> 
+<style>
+.alive {
+  background-color: white;
+}
+.dead {
+  background-color: red;
+
+}
+
+</style>
   </head>
   <body>
     <div id='domWorld'>
 
     </div>
 
-    <script type="module">
+  <script>
+    const nrRows = 4
+const nrColumns = 4
+    let world = new World(nrRows, nrColumns)
+    const domWorld = world.visualizeInDom()
+    document.body.appendChild(domWorld)
+    setInterval(()=>{
+      world = world.tick()
+      const domWorld = world.visualizeInDom()
+      document.body.innerHTML = ''
+      document.body.appendChild(domWorld)
+    }, 1000)
+
+
+  </script>
+<!--    <script type="module">
       import * as test from '/front-end.js'
       const world = new test.World()
 
@@ -15,6 +40,6 @@
       const domWorld = world.visualizeInDom({document})
       document.body.appendChild(domWorld)
 
-      </script>
+</script>-->
   </body>
 </html>

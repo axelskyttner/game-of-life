@@ -5,20 +5,20 @@ const sinon = require('sinon')
 const assert = require('assert')
 
 const frontEnd = require('./public/front-end')
-describe('server ', () => {
-  it('should return index.html', (done)=> {
-    request(product.app)
-      .get('/gameoflife')
-      .expect((res)=>{
-
-        // todo uply fetching..
-        const bodyString = res.res.text
-        expect(bodyString).to.contain('html')
-        done()
-      })
-      .catch(err=>{done(err)})
-  })
-})
+//describe('server ', () => {
+//  it('should return index.html', (done)=> {
+//    request(product.app)
+//      .get('/gameoflife')
+//      .expect((res)=>{
+//
+//        // todo uply fetching..
+//        const bodyString = res.res.text
+//        expect(bodyString).to.contain('html')
+//        done()
+//      })
+//      .catch(err=>{done(err)})
+//  })
+//})
 
 
 describe('test of drawBoard', () => {
@@ -58,6 +58,11 @@ describe('test of drawBoard', () => {
       }
       this.components = []
       this.style = ''
+      this.classList = {
+        add: (value) => {
+          this.style = value
+        }
+      }
     }
 
     const createElement = () => {
@@ -71,11 +76,11 @@ describe('test of drawBoard', () => {
     const world = new frontEnd.World(nrRows, nrColumns)
     const resultDiv = world.visualizeInDom({document})
     const childrens = resultDiv.children()
-    console.log('childrens style', childrens.map(a=>a.style))
     const nrFamiliesAlive = world.countAliveFamilies()
     const nrChildrenAlive = childrens.filter(element => {
       return element.getClass()  === 'dead'
     }).length
+
     expect(nrChildrenAlive).to.equal(nrFamiliesAlive)
   })
   it('should be able to print the state in a list', () => {

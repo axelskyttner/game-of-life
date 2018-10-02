@@ -7,11 +7,12 @@ app.get('/gameoflife', (req, res) => {
 })
 
 app.use(express.static('./public'))
-// const port = 80
-// app.listen(port, () => {
-//   console.log('listening on port ', port)
-// })
-
-module.exports = {
-  app: app,
+const port = 3000
+app.listen(port, () => {
+  console.log('listening on port ', port)
+})
+if(typeof module !== undefined){
+  module.exports = {
+    app: app,
+  }
 }
