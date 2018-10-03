@@ -1,6 +1,6 @@
 <html>
   <head>
-    <script src="/front-end.js"></script> 
+    <script src="/front-end.js"></script>
     <style>
 .alive {
   background-color: white;
@@ -41,8 +41,8 @@ const generateOscillatingWorld = () => {
   const newFamilies = families.map(family=>{
     const newFamily = family.clone()
     if(
-      newFamily.streetNumber === 2 && newFamily.houseNumber === 1 || 
-      newFamily.streetNumber === 2 && newFamily.houseNumber === 2 || 
+      newFamily.streetNumber === 2 && newFamily.houseNumber === 1 ||
+      newFamily.streetNumber === 2 && newFamily.houseNumber === 2 ||
       newFamily.streetNumber === 2 && newFamily.houseNumber === 3
     ){
       newFamily.restore()
@@ -57,15 +57,15 @@ const generateOscillatingWorld = () => {
   return world
 }
 
-const nrRows = 30
-const nrColumns = 15
+const nrRows = 50
+const nrColumns = 30
 let world = new World(nrRows, nrColumns)
 showWorld(world)
 //updateWorld()
 
 setInterval(()=>{
   updateWorld()
-}, 1e3)
+}, 1e2)
     </script>
   </body>
 </html>
