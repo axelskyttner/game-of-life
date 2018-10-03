@@ -1,76 +1,46 @@
 const expect = require('chai').expect
 const request = require('supertest')
-const product = require('./server')
 const sinon = require('sinon')
 const assert = require('assert')
 
 const frontEnd = require('./public/front-end')
-//describe('server ', () => {
-//  it('should return index.html', (done)=> {
-//    request(product.app)
-//      .get('/gameoflife')
-//      .expect((res)=>{
-//
-//        // todo uply fetching..
-//        const bodyString = res.res.text
-//        expect(bodyString).to.contain('html')
-//        done()
-//      })
-//      .catch(err=>{done(err)})
-//  })
-//})
-
 
 describe('test of drawBoard', () => {
-/*
-  it('should create a board from a World', () => {
-    const nrRows = 3
-    const nrColumns = 4
-    const world = new frontEnd.World(nrRows, nrColumns)
-    const htmlStub = function () {
-      this.appendChild = (element) => {
-        this.components.push(element)
-      },
-        this.components = []
-      this.setAttribute = (type, value) => {
-        this.style = value
-      }
-    }
-
-    const createElement = sinon.fake.returns(new htmlStub())
-    const document = {
-      createElement
-    }
-    const resultDiv = world.visualizeInDom({document})
-    expect(resultDiv.components.length).to.equal(nrRows*nrColumns)
-  }) */
-  it('should have different css depending if its alive or not', () => {
-    const htmlStub = function () {
-      this.appendChild = (element) => {
-        this.components.push(element)
-      },
+  let documentStub
+  const htmlStub = function () {
+    this.appendChild = (element) => {
+      this.components.push(element)
+    },
       this.children = () => this.components
-      this.getClass = () => {
-        return this.style
-      }
-      this.setAttribute = (type, value) => {
-        this.style = value
-      }
+    this.getClass = () => {
+      return this.class
+    }
+    this.setAttribute = (type, value) => {
+      this[type] = value
+    }
+    this.getAttribute = () =>{
+      return this.style
+    },
       this.components = []
-      this.style = ''
-      this.classList = {
-        add: (value) => {
-          this.style = value
-        }
-      }
-    }
+    this.style = ''
+    this.class = 11
+  }
 
-    const createElement = () => {
-      return new htmlStub()
-    }
-    const document = {
+  const createElement = () => {
+    return new htmlStub()
+  }
+  const document = {
+    createElement
+  }
+  beforeEach(()=>{
+    global.document = {
       createElement
     }
+  })
+  afterEach(()=>{
+    delete global.document
+  })
+  it('should have different css depending if its alive or not', () => {
     const nrRows = 3
     const nrColumns = 4
     const world = new frontEnd.World(nrRows, nrColumns)
@@ -78,7 +48,7 @@ describe('test of drawBoard', () => {
     const childrens = resultDiv.children()
     const nrFamiliesAlive = world.countAliveFamilies()
     const nrChildrenAlive = childrens.filter(element => {
-      return element.getClass()  === 'dead'
+      return element.getClass()  === 'alive'
     }).length
 
     expect(nrChildrenAlive).to.equal(nrFamiliesAlive)
@@ -91,12 +61,22 @@ describe('test of drawBoard', () => {
     const currentState = world.getCurrentState()
     expect(currentState.length).to.equal(nrRows * nrColumns)
   })
-  it('every tick should kill and spawn families', () => {
+  it('every dom element should have a position', () => {
     const nrRows = 3
     const nrColumns = 3
     const world = new frontEnd.World(nrRows, nrColumns)
+    const domElements = world.visualizeInDom()
+    const firstDom = domElements.children()[0]
+    const styleAttribute = firstDom.getAttribute('style')
+
+    expect(styleAttribute).to.contain('left: 0px')
+  })
+  it('every tick should kill and spawn families', () => {
+    const nrRows = 9
+    const nrColumns = 9
+    const world = new frontEnd.World(nrRows, nrColumns)
     const nrDeadBefore = world.countDead()
-    const newWorld = world.tick()
+    const newWorld = world.tick().tick()
     const nrDeadAfter = newWorld.countDead()
 
     expect(nrDeadAfter).to.not.equal(nrDeadBefore)
@@ -159,8 +139,35 @@ describe('help functions', () => {
     const nrAliveNeighbours = frontEnd.__test__.countAliveNeighbours(theFamily, familyList)
     expect(nrDeadNeighbours).to.equal(2)
     expect(nrAliveNeighbours).to.equal(1)
-    
-
   })
+})
 
+describe('testing oscillating behaviour', () => {
+  it('should oscillate if given line of 3', () => {
+    const nrRows = 5
+    const nrColumns = 5
+    const world = new frontEnd.World(nrRows, nrColumns)
+    const families = world.getFamilies()
+    const newFamilies = families.map(family=>{
+      const newFamily = family.clone()
+      if(
+        newFamily.streetNumber === 2 && newFamily.houseNumber === 1|| 
+        newFamily.streetNumber === 2 && newFamily.houseNumber === 2|| 
+        newFamily.streetNumber === 2 && newFamily.houseNumber === 3
+      ){
+        newFamily.restore()
+      }
+      else{
+        newFamily.kill()
+      }
+      return newFamily
+    })
+    world.setFamilies(newFamilies)
+    const nrSurvivals = world
+      .tick()
+      .getFamilies()
+      .filter(a=>!a.areWeDead())
+      .length
+    expect(nrSurvivals).to.equal(3)
+  })
 })

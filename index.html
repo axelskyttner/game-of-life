@@ -1,7 +1,7 @@
 <html>
   <head>
     <script src="/front-end.js"></script> 
-<style>
+    <style>
 .alive {
   background-color: white;
 }
@@ -10,36 +10,62 @@
 
 }
 
-</style>
+    </style>
   </head>
   <body>
     <div id='domWorld'>
 
     </div>
 
-  <script>
-    const nrRows = 4
-const nrColumns = 4
-    let world = new World(nrRows, nrColumns)
-    const domWorld = world.visualizeInDom()
-    document.body.appendChild(domWorld)
-    setInterval(()=>{
-      world = world.tick()
-      const domWorld = world.visualizeInDom()
-      document.body.innerHTML = ''
-      document.body.appendChild(domWorld)
-    }, 1000)
+    <script>
 
+const updateWorld = () => {
 
-  </script>
-<!--    <script type="module">
-      import * as test from '/front-end.js'
-      const world = new test.World()
+  world = world.tick()
+  showWorld(world)
 
+}
+const showWorld = (world) => {
 
-      const domWorld = world.visualizeInDom({document})
-      document.body.appendChild(domWorld)
+  const domWorld = world.visualizeInDom()
+  document.body.innerHTML = ''
+  document.body.appendChild(domWorld)
+}
 
-</script>-->
+const generateOscillatingWorld = () => {
+
+  const nrRows = 5
+  const nrColumns = 5
+  const world = new World(nrRows, nrColumns)
+  const families = world.getFamilies()
+  const newFamilies = families.map(family=>{
+    const newFamily = family.clone()
+    if(
+      newFamily.streetNumber === 2 && newFamily.houseNumber === 1 || 
+      newFamily.streetNumber === 2 && newFamily.houseNumber === 2 || 
+      newFamily.streetNumber === 2 && newFamily.houseNumber === 3
+    ){
+      newFamily.restore()
+    }
+    else{
+      newFamily.kill()
+    }
+    return newFamily
+  })
+
+  world.setFamilies(newFamilies)
+  return world
+}
+
+const nrRows = 30
+const nrColumns = 15
+let world = new World(nrRows, nrColumns)
+showWorld(world)
+//updateWorld()
+
+setInterval(()=>{
+  updateWorld()
+}, 1e3)
+    </script>
   </body>
 </html>
